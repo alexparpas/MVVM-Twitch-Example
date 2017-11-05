@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class TwitchStream {
     private long id;
-    @SerializedName("average_fps") private int fps;
+    @SerializedName("average_fps") private double fps;
     private TwitchChannel channel;
     @SerializedName("created_at") private String createdAt;
     private String game;
@@ -27,11 +27,11 @@ public class TwitchStream {
         this.id = id;
     }
 
-    public int getFps() {
+    public double getFps() {
         return fps;
     }
 
-    public void setFps(int fps) {
+    public void setFps(double fps) {
         this.fps = fps;
     }
 

@@ -156,4 +156,26 @@ public class TwitchVideo {
     public void setViews(int views) {
         this.views = views;
     }
+
+    @Override
+    public String toString() {
+        return "TwitchVideo{" +
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", channel=" + channel +
+                ", createdAt='" + createdAt + '\'' +
+                ", description='" + description + '\'' +
+                ", descriptionHtml='" + descriptionHtml + '\'' +
+                ", game='" + game + '\'' +
+                ", language='" + language + '\'' +
+                ", length=" + length +
+                ", preview=" + preview +
+                ", status='" + status + '\'' +
+                ", thumbnails=" + thumbnails +
+                ", title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                ", viewable='" + viewable + '\'' +
+                ", views=" + views +
+                '}';
+    }
 }

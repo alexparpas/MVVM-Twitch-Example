@@ -1,17 +1,16 @@
 package com.example.alex.retrofitrxjavasample.http;
 
-import android.databinding.ObservableField;
-
+import com.example.alex.retrofitrxjavasample.model.StreamsResponseWrapper;
 import com.example.alex.retrofitrxjavasample.model.TwitchGameSummary;
-import com.example.alex.retrofitrxjavasample.model.TwitchResponse;
-import com.example.alex.retrofitrxjavasample.model.TwitchStream;
+import com.example.alex.retrofitrxjavasample.model.TwitchUser;
 import com.example.alex.retrofitrxjavasample.model.TwitchVideo;
+import com.example.alex.retrofitrxjavasample.model.UserResonseWrapper;
+import com.example.alex.retrofitrxjavasample.model.VideosResponseWrapper;
 
 import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -20,12 +19,15 @@ import retrofit2.http.Query;
  */
 
 public interface TwitchService {
-    @GET("streams?game=Overwatch")
-    Observable<List<TwitchResponse>> getOverwatchStreams();
+    @GET("streams")
+    Observable<StreamsResponseWrapper> getGameStreams(@Query("game") String game);
 
     @GET("streams/summary")
     Observable<TwitchGameSummary> getGameSummary(@Query("game") String game);
 
-    @GET("channels/{channelId}/videos")
-    Observable<TwitchVideo> getChannelVideos(@Path("channelId") String channelId);
+    @GET("channels/{id}/videos")
+    Observable<VideosResponseWrapper> getChannelVideos(@Path("id") String channelId);
+
+    @GET("users")
+    Observable<UserResonseWrapper> getUser(@Query("login") String name);
 }

@@ -6,11 +6,11 @@ import java.util.List;
  * Created by Alex on 23/09/2017.
  */
 
-public class TwitchResponse {
+public class StreamsResponseWrapper {
     private int total;
     private List<TwitchStream> streams;
 
-    public TwitchResponse() {
+    public StreamsResponseWrapper() {
     }
 
     public int getTotal() {
@@ -31,7 +31,7 @@ public class TwitchResponse {
 
     @Override
     public String toString() {
-        return "TwitchResponse{" +
+        return "StreamsResponseWrapper{" +
                 "total=" + total +
                 ", streams=" + streams +
                 '}';

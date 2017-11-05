@@ -8,15 +8,22 @@ import android.view.View;
 
 import com.example.alex.retrofitrxjavasample.base.IViewModel;
 import com.example.alex.retrofitrxjavasample.http.TwitchClient;
+import com.example.alex.retrofitrxjavasample.model.StreamsResponseWrapper;
 import com.example.alex.retrofitrxjavasample.model.TwitchGameSummary;
-import com.example.alex.retrofitrxjavasample.model.TwitchResponse;
+import com.example.alex.retrofitrxjavasample.model.TwitchStream;
+import com.example.alex.retrofitrxjavasample.model.TwitchUser;
+import com.example.alex.retrofitrxjavasample.model.TwitchVideo;
+import com.example.alex.retrofitrxjavasample.model.VideosResponseWrapper;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -29,12 +36,14 @@ public class MainViewModel implements IViewModel {
     public ObservableInt mEmptyStateVisibility;
     public ObservableInt mRecyclerViewVisibility;
     public ObservableField<String> mGameTitle;
+    public ObservableField<String> mChannelName;
 
     public MainViewModel(Context context) {
         mContext = context;
         mEmptyStateVisibility = new ObservableInt(View.GONE);
         mRecyclerViewVisibility = new ObservableInt(View.GONE);
         mGameTitle = new ObservableField<>("Injustice 2");
+        mChannelName = new ObservableField<>("Netherrealm");
     }
 
     @Override
@@ -44,17 +53,18 @@ public class MainViewModel implements IViewModel {
 
     public void onStreamsClicked() {
         TwitchClient.getClient()
-                .getOverwatchStreams()
-                .subscribeOn(Schedulers.newThread())
+                .getGameStreams(mGameTitle.get())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<TwitchResponse>>() {
+                .map(StreamsResponseWrapper::getStreams)
+                .subscribe(new Observer<List<TwitchStream>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(@NonNull List<TwitchResponse> twitchStreams) {
+                    public void onNext(@NonNull List<TwitchStream> twitchStreams) {
                         Log.d(TAG, "onNext: " + twitchStreams.toString());
                     }
 
@@ -73,7 +83,7 @@ public class MainViewModel implements IViewModel {
     public void onSummaryClicked() {
         TwitchClient.getClient()
                 .getGameSummary(mGameTitle.get())
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<TwitchGameSummary>() {
                     @Override
@@ -94,6 +104,40 @@ public class MainViewModel implements IViewModel {
                     @Override
                     public void onComplete() {
                         Log.d(TAG, "onComplete: ");
+                    }
+                });
+    }
+
+    public void onChannelVideosClicked() {
+        TwitchClient.getClient()
+                .getUser(mChannelName.get())
+                .flatMap(twitchUser -> {
+                    String id = String.valueOf(twitchUser.getUsers().get(0).getId());
+                    Log.d(TAG, "onChannelVideosClicked: id: " + id);
+                    return TwitchClient.getClient().getChannelVideos(id);
+                })
+                .map(VideosResponseWrapper::getVideos)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<TwitchVideo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+                    }
+
+                    @Override
+                    public void onNext(List<TwitchVideo> twitchVideos) {
+                        Log.d(TAG, "onNext() called with: twitchVideos = [" + twitchVideos.toString() + "]");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onError() called with: e = [" + e.getMessage() + "]");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete() called");
                     }
                 });
     }
